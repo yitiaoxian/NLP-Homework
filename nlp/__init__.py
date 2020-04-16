@@ -1,3 +1,5 @@
+import os
+
 from pyltp import SentenceSplitter
 from pyltp import Segmentor
 from pyltp import Postagger
@@ -23,7 +25,7 @@ def word_splitter(sentence):
     '''
     segmentor = Segmentor()
     #初始化实例
-    segmentor.load('E:\\NLP-Project\\ltp-data-v3.3.1\\ltp_data\\cws.model')
+    segmentor.load('E:\\NLP-homework\\ltp-data-v3.3.1\\ltp_data\\cws.model')
     #加载模型
     words = segmentor.segment(sentence)
     #分词
@@ -48,7 +50,7 @@ def word_tags(words):
     '''
     postagger = Postagger()
     #初始化实例
-    postagger.load('E:\\NLP-Project\\ltp-data-v3.3.1\\ltp_data\\pos.model')
+    postagger.load('E:\\NLP-homework\\ltp-data-v3.3.1\\ltp_data\\pos.model')
     postags = postagger.postag(words)
     #词性标注
     #print("词性标注结果")
@@ -67,7 +69,7 @@ def name_recognition(words,postags):
     '''
     recognizer = NamedEntityRecognizer()
     #初始化实例
-    recognizer.load('E:\\NLP-Project\\ltp-data-v3.3.1\\ltp_data\\ner.model')
+    recognizer.load('E:\\NLP-homework\\ltp-data-v3.3.1\\ltp_data\\ner.model')
     #模型加载
     netags = recognizer.recognize(words,postags)
     #识别命名实体
@@ -94,12 +96,28 @@ def parse(words,postags):
     '''
     parser = Parser()
     #初始化实例
-    parser.load('E:\\NLP-Project\\ltp-data-v3.3.1\\ltp_data\\parser.model')
+    parser.load('E:\\NLP-homework\\ltp-data-v3.3.1\\ltp_data\\parser.model')
     #加载parser的模型数据
     arcs = parser.parse(words,postags)
     #句法分析
     print("\t".join("%d:%s" % (arc.head, arc.relation) for arc in arcs))
     parser.release()  # 释放模型
+
+def posttaggerNH(self, word_list):
+        """
+        ltp的词性标注,获取人名nh
+        :param word_list:
+        :return:
+        """
+
+        postags = self.postagger.postag(word_list)  # 词性标注
+        name_list = []
+        for word, tag in zip(word_list, postags):
+            if tag == "nh" and len(word) > 3:
+                print (word + '/' + tag)
+                name_list.append(word)
+        # postagger.release()  # 释放模型
+        return list(postags), name_list
 
 #测试命名实体的识别
 print('测试命名实体识别')

@@ -16,27 +16,11 @@ class BookPostag:
     postag_root_path = "E:\\NLP-homework\\BookPostag"
     #语料路径
 
-    segment = Segmentor()
-    segment.load(ltp_model_path + "\\cws.model")
+    segmentor = Segmentor()
+    segmentor.load(ltp_model_path + "\\cws.model")
 
     postagger = Postagger()
     postagger.load(ltp_model_path + "\\pos.model")
-
-    def getAllPath(self):
-        txtpathlist = []
-        dirlist = os.listdir(self.book_root_path)
-        #要处理的文本
-        for dirname in dirlist:
-            print('getALLpath:',dirname)
-            #path = self.book_root_path+ "\\" + dirname
-            path = self.book_root_path
-            txtlist = os.listdir()
-            for txtname in txtlist:
-                print(txtname)
-                txtpath = path + "\\" + txtname
-                txtpathlist.append(txtpath)
-        print('getAllPath中的：',len(txtpathlist))
-        return txtpathlist
 
     def segmentor(self,sentence = "测试测试啊哈哈哈"):
         '''
@@ -44,7 +28,7 @@ class BookPostag:
         :param sentence:
         :return:
         '''
-        words = self.segment.load(sentence)
+        words = self.segmentor.segment(sentence)
         words_list = list(words)
         # for word in words_list:
         #     print word
@@ -67,26 +51,53 @@ class BookPostag:
         # postagger.release()  # 释放模型
         return dan_list
 
-    def getDAN(self,path="E:/NLP-homework/book/ThethreebodyproblemI.txt"):
+    def getDAN(self):
+        '''
+        读取文本文件,获取danlist
+        :return:
+        '''
+        #txts = []
+        dan_list = []
+        files = os.listdir(self.book_root_path)
+        for file in files:
+            fileposition = self.book_root_path + "\\" + file
+            print("file name:", fileposition)
+            with open(fileposition,"r",encoding="utf-8")as f:
+                lines = f.readline()
+                for line in lines :
+                    #txts.append(line)
+                    if line != "":
+                        sentences = SentenceSplitter.split(line)
+                        print("sentences:", sentences)
+                        for sentence in sentences:
+                            words = self.segmentor(sentence)
+                            dan_list_line = self.postagger(words)
+                            dan_list += dan_list_line
+                f.close()
+        return list(set(dan_list))
+
+
+
+    #def getDAN(self):
 
         '''
         #path  文章路径;
         :param path:
         :return:
         '''
-        dan_list = []
-        rf = open(path,"r")
-        lines = rf.readline()
-        rf.close()
-        for line in lines:
-            if line != "":
-                sents = SentenceSplitter.split(line)
-                for sent in sents :
-                    words = self.segmentor(sent)
-                    dan_list_line = self.postagger(words)
-                    dan_list += dan_list_line
+      #  dan_list = []
+       # rf = open(path,"r")
+        #lines = rf.readline()
+        #rf.close()
+        #for line in lines:
+         #   if line != "":
+          #      sents = SentenceSplitter.split(line)
+           #     for sent in sents :
+            #        words = self.segmentor(sent)
+             #       dan_list_line = self.postagger(words)
+              #      dan_list += dan_list_line
 
-        return list(set(dan_list))
+        #return list(set(dan_list))
 
     def getResult(self):
         allResult = []
@@ -120,9 +131,11 @@ class BookPostag:
 import time
 
 start = time.time()
+listx = []
 bookpostag = BookPostag()
-bookpostag.getResult()
-bookpostag.splitTxt()
+listx = bookpostag.getDAN()
+#bookpostag.getResult()
+#bookpostag.splitTxt()
 end = time.time()
 
 print("语料构造花费时间：",end-start)
