@@ -126,6 +126,7 @@ class BookPostag:
         return resultList
 
     def writeDan(self,path,filename,sortedList):
+        #print("写语料结果",path,filename)
         wf = open(path+"\\"+filename,"w",encoding="utf-8")
         for elem in sortedList:
             wf.write(elem)
